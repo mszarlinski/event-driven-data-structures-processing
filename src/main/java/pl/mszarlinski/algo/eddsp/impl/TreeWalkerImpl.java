@@ -1,27 +1,17 @@
 package pl.mszarlinski.algo.eddsp.impl;
 
-import static java.lang.String.format;
-import pl.mszarlinski.algo.eddsp.api.OnBottomUpNodeVisitedCallback;
-import pl.mszarlinski.algo.eddsp.api.OnLeafVisitedCallback;
-import pl.mszarlinski.algo.eddsp.api.OnProcessingFinishedCallback;
-import pl.mszarlinski.algo.eddsp.api.OnProcessingStartedCallback;
-import pl.mszarlinski.algo.eddsp.api.OnUpBottomNodeVisitedCallback;
-import pl.mszarlinski.algo.eddsp.api.Parameter;
-import pl.mszarlinski.algo.eddsp.api.TraverseResult;
+import pl.mszarlinski.algo.eddsp.api.*;
 import pl.mszarlinski.algo.eddsp.core.TreeNode;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
+import static java.lang.String.format;
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 
 /**
  * Created by mszarlinski on 2015-08-23.
  */
 public class TreeWalkerImpl {
-
     private TreeNode rootNode;
     private final List<OnProcessingStartedCallback> onProcessingStartedCallbackList = new LinkedList<>();
     private final List<OnProcessingFinishedCallback> onProcessingFinishedCallbackList = new LinkedList<>();
@@ -31,6 +21,11 @@ public class TreeWalkerImpl {
 
     public TreeWalkerImpl from(final int[] from, final int[] to, final int rootId) {
         rootNode = TreeBuilder.buildTreeFromArrays(from, to, rootId);
+        return this;
+    }
+
+    public TreeWalkerImpl from(final int[] from, final int[] to, final int[] value, final int rootId) {
+        rootNode = TreeBuilder.buildTreeFromArraysWithValues(from, to, value, rootId);
         return this;
     }
 
@@ -72,7 +67,7 @@ public class TreeWalkerImpl {
 
         fireEvent(TreeEvent.PROCESSING_STARTED, processingContext);
 
-        while (!stack.isEmpty() && !halt.get(processingContext)) {
+        while (keepTraversing(processingContext, halt, stack)) {
             final TreeNode currentNode = stack.pop();
             processNode(currentNode, stack, processingContext);
         }
@@ -80,6 +75,10 @@ public class TreeWalkerImpl {
         fireEvent(TreeEvent.PROCESSING_FINISHED, processingContext);
 
         return new TraverseResult(processingContext, rootNode);
+    }
+
+    private boolean keepTraversing(Map<String, Object> processingContext, Parameter<Boolean> halt, Deque<TreeNode> stack) {
+        return !stack.isEmpty() && isNotTrue(halt.get(processingContext));
     }
 
     private void fireEvent(final TreeEvent event, final Map<String, Object> processingContext) {

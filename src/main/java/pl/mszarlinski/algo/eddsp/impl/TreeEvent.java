@@ -9,5 +9,5 @@ public enum TreeEvent {
 
     LEAF_VISITED,
     BOTTOM_UP_NODE_VISITED,
-    UP_BOTTOM_NODE_VISITED;
+    UP_BOTTOM_NODE_VISITED
 }
