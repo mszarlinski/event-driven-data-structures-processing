@@ -3,7 +3,7 @@ package pl.mszarlinski.algo.eddsp.api;
 import pl.mszarlinski.algo.eddsp.impl.TreeWalkerImpl;
 
 /**
- * Created by Maciej on 2015-08-23.
+ * Created by mszarlinski on 2015-08-23.
  */
 public interface TreeWalker {
 

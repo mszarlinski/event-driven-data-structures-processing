@@ -1,9 +1,10 @@
 package pl.mszarlinski.algo.eddsp.impl;
 
+import pl.mszarlinski.algo.eddsp.api.Parameter;
 import pl.mszarlinski.algo.eddsp.core.TreeNode;
 
 /**
- * Created by Maciej on 2015-08-23.
+ * Created by mszarlinski on 2015-08-23.
  */
 public class TreeBuilder {
     public static TreeNode buildTreeFromArrays(final int[] from, final int[] to, final int rootId) {
@@ -29,6 +30,8 @@ public class TreeBuilder {
     }
 
     public static TreeNode buildTreeFromArraysWithValues(final int[] from, final int[] to, final int[] values, final int rootId) {
+        final Parameter<Integer> value = new Parameter<>("value");
+
         final int nodesCount = from.length + 1;
         final TreeNode[] nodes = new TreeNode[nodesCount];
 
@@ -38,12 +41,12 @@ public class TreeBuilder {
 
             if (nodes[fromId] == null) {
                 nodes[fromId] = new TreeNode(fromId);
-                nodes[fromId].getData().put("value", values[fromId]);
+                value.put(nodes[fromId].getData(), values[fromId]);
             }
 
             if (nodes[toId] == null) {
                 nodes[toId] = new TreeNode(toId);
-                nodes[toId].getData().put("value", values[toId]);
+                value.put(nodes[toId].getData(), values[toId]);
             }
 
             nodes[fromId].getChildren().add(nodes[toId]);

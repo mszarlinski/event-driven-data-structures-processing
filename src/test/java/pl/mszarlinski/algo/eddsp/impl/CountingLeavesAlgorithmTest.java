@@ -1,14 +1,14 @@
 package pl.mszarlinski.algo.eddsp.impl;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-import pl.mszarlinski.algo.eddsp.api.TraverseResult;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static pl.mszarlinski.algo.eddsp.api.TreeWalker.aTreeWalker;
+import pl.mszarlinski.algo.eddsp.api.TraverseResult;
+
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 /**
- * Created by Maciej on 2015-08-23.
+ * Created by mszarlinski on 2015-08-23.
  */
 public class CountingLeavesAlgorithmTest {
     @DataProvider(name = "data")
@@ -47,6 +47,4 @@ public class CountingLeavesAlgorithmTest {
         assertThat(result.getProcessingContext().get("leavesCount")).isEqualTo(expected);
 
     }
-
-
 }

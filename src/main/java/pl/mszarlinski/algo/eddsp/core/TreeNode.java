@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Maciej on 2015-08-23.
+ * Created by mszarlinski on 2015-08-23.
  */
 public class TreeNode {
 

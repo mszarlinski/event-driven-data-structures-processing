@@ -5,7 +5,7 @@ import pl.mszarlinski.algo.eddsp.core.TreeNode;
 import java.util.Map;
 
 /**
- * Created by Maciej on 2015-08-23.
+ * Created by mszarlinski on 2015-08-23.
  */
 @FunctionalInterface
 public interface OnUpBottomNodeVisitedCallback {

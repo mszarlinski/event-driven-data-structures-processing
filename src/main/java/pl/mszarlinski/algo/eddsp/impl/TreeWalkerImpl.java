@@ -1,14 +1,24 @@
 package pl.mszarlinski.algo.eddsp.impl;
 
-import pl.mszarlinski.algo.eddsp.api.*;
+import static java.lang.String.format;
+import pl.mszarlinski.algo.eddsp.api.OnBottomUpNodeVisitedCallback;
+import pl.mszarlinski.algo.eddsp.api.OnLeafVisitedCallback;
+import pl.mszarlinski.algo.eddsp.api.OnProcessingFinishedCallback;
+import pl.mszarlinski.algo.eddsp.api.OnProcessingStartedCallback;
+import pl.mszarlinski.algo.eddsp.api.OnUpBottomNodeVisitedCallback;
+import pl.mszarlinski.algo.eddsp.api.Parameter;
+import pl.mszarlinski.algo.eddsp.api.TraverseResult;
 import pl.mszarlinski.algo.eddsp.core.TreeNode;
 
-import java.util.*;
-
-import static java.lang.String.format;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
- * Created by Maciej on 2015-08-23.
+ * Created by mszarlinski on 2015-08-23.
  */
 public class TreeWalkerImpl {
 
@@ -31,34 +41,45 @@ public class TreeWalkerImpl {
         if (loggingEnabled) {
             onProcessingStartedCallbackList.add(ctx -> TreeLogger.log("Processing started"));
             onProcessingFinishedCallbackList.add(ctx -> TreeLogger.log("Processing finished"));
-            onBottomUpNodeVisitedCallbackList.add((node, ctx) -> TreeLogger.log(format("Processing of node %d subtree started", node.getId())));
-            onUpBottomNodeVisitedCallbackList.add((node, ctx) -> TreeLogger.log(format("Processing of node %d subtree finished", node.getId())));
+            onBottomUpNodeVisitedCallbackList.add((node, ctx) -> TreeLogger.log(format("Processing of node %d subtree finished", node.getId())));
+            onUpBottomNodeVisitedCallbackList.add((node, ctx) -> TreeLogger.log(format("Processing of node %d subtree started", node.getId())));
             onLeafVisitedCallbackList.add((leaf, ctx) -> TreeLogger.log(format("Leaf %d visited", leaf.getId())));
         }
         return this;
     }
 
-    public TreeWalkerImpl onLeaf(final OnLeafVisitedCallback onLeafVisitedCallback) {
-        onLeafVisitedCallbackList.add(onLeafVisitedCallback);
+    public TreeWalkerImpl onLeaf(final OnLeafVisitedCallback callback) {
+        onLeafVisitedCallbackList.add(callback);
+        return this;
+    }
+
+    public TreeWalkerImpl onBottomUpNode(final OnBottomUpNodeVisitedCallback callback) {
+        onBottomUpNodeVisitedCallbackList.add(callback);
+        return this;
+    }
+
+    public TreeWalkerImpl onUpBottomNode(final OnUpBottomNodeVisitedCallback callback) {
+        onUpBottomNodeVisitedCallbackList.add(callback);
         return this;
     }
 
     public TraverseResult traverse() {
 
         final Map<String, Object> processingContext = new HashMap<>();
+        final Parameter<Boolean> halt = new Parameter<>("halt"); // enable exiting main loop
         final Deque<TreeNode> stack = new LinkedList<>();
         stack.push(rootNode);
 
         fireEvent(TreeEvent.PROCESSING_STARTED, processingContext);
 
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty() && !halt.get(processingContext)) {
             final TreeNode currentNode = stack.pop();
             processNode(currentNode, stack, processingContext);
         }
 
         fireEvent(TreeEvent.PROCESSING_FINISHED, processingContext);
 
-        return new TraverseResult(processingContext);
+        return new TraverseResult(processingContext, rootNode);
     }
 
     private void fireEvent(final TreeEvent event, final Map<String, Object> processingContext) {
